@@ -1,4 +1,4 @@
-import { Client } from 'pg';
+import { Pool } from 'pg';
 
 const {
   PG_USER: user,
@@ -9,7 +9,7 @@ const {
 
 const port = Number(process.env.PG_PORT ?? 5432);
 
-export const db = new Client({
+export const db = new Pool({
   user,
   host,
   database,
