@@ -14,12 +14,22 @@ async function start_server() {
   const PORT = process.env.PORT || 3201;
 
   try {
-    await db.connect();
     app.listen(PORT, () => console.log(`Server is running on PORT ${PORT}`));
   } catch (error) {
-    console.error(error);
-    await db.end();
+    console.error('Error starting server: ' + error);
   }
+
+  process.on('SIGINT', async () => {
+    console.log('Gracefully shutting down');
+    await db.end();
+    process.exit(0);
+  });
+
+  process.on('SIGTERM', async () => {
+    console.log('Gracefully shutting down');
+    await db.end();
+    process.exit(0);
+  });
 }
 
 start_server();
