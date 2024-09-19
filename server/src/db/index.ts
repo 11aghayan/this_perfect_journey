@@ -9,7 +9,7 @@ const {
 
 const port = Number(process.env.PG_PORT ?? 5432);
 
-export const db_client = new Pool({
+export const db = new Pool({
   user,
   host,
   database,
