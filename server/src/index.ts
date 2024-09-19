@@ -1,8 +1,8 @@
+import 'module-alias/register';
 import 'dotenv/config';
 import express from 'express';
 import cookie_parser from 'cookie-parser';
-import { db_client } from './db';
-const {  } = 'pg';
+import { db_client } from '@/db';
 
 const app = express();
 
@@ -20,6 +20,6 @@ async function start_server() {
     console.error(error);
     await db_client.end();
   }
-} 
+}
 
 start_server();
