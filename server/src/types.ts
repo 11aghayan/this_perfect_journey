@@ -1,17 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 
-declare namespace NodeJS {
-  interface ProcessEnv {
-    PG_USER: string;
-    PG_HOST: string;
-    PG_PORT: string;
-    PG_DATABASE: string;
-    PG_PASSWORD: string;
-    ACCESS_TOKEN_SECRET: string;
-    REFRESH_TOKEN_SECRET: string;
-  }
-}
-
 type Enumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N ? Acc[number] : Enumerate<N, [...Acc, Acc['length']]>;
 export type IntRange<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>;
 
@@ -22,7 +10,7 @@ export type T_Trip_Type = 'rel' | 'sig' | 'act' | 'cul' | 'par';
 export type T_Priority = 'h' | 'm' | 'l';
 export type T_Cover_For = 't' | 'd';
 export type T_Cover_Pos = 'l' | 'm' | 'r';
-export type T_Rating_Score = IntRange<1, 50>;
+export type T_Rating_Score = IntRange<1, 51>;
 
 export type T_User = {
   id: string;
@@ -31,6 +19,7 @@ export type T_User = {
   birthday?: string;
   sex?: T_Sex;
   join_date: string;
+  refresh_token: string;
 };
 
 export type T_Password = {
@@ -43,6 +32,7 @@ export type T_Admin = {
   username: string;
   permission: T_Permission;
   password_hash: string;
+  refresh_token: string;
 };
 
 export type T_Profile_Photo = {
@@ -98,4 +88,4 @@ export type T_Rating = {
   dislike_count: number;
 };
 
-export type T_Controller = (req: Request, res: Response, next: NextFunction) => Response<any>;
+export type T_Controller = (req: Request, res: Response, next: NextFunction) => any;

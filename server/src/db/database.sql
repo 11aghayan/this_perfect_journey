@@ -33,7 +33,7 @@ CREATE DOMAIN COVER_FOR AS CHAR(1)
 CREATE DOMAIN COVER_POS AS CHAR(1)
   CHECK(value ~* '^l$|^m$|^r$');
 
-CREATE DOMAIN RATING_SCORE AS SMALLINT(2)
+CREATE DOMAIN RATING_SCORE AS SMALLINT
   CHECK(value >= 1 AND value <= 50);
 
 -- TABLES
@@ -43,7 +43,8 @@ CREATE TABLE user_tbl (
   name VARCHAR(100) NOT NULL,
   birthday DATE,
   sex SEX,
-  join_date DATE DEFAULT now() NOT NULL
+  join_date DATE DEFAULT now() NOT NULL,
+  refresh_token VARCHAR(255)
 );
 
 CREATE TABLE password_tbl (
@@ -60,7 +61,8 @@ CREATE TABLE admin_tbl (
   id ID PRIMARY KEY,
   username VARCHAR(20) UNIQUE NOT NULL,
   permission PERMISSION,
-  password_hash VARCHAR(60) NOT NULL
+  password_hash VARCHAR(60) NOT NULL,
+  refresh_token VARCHAR(255)
 ); 
 
 CREATE TABLE profile_photo_tbl (
