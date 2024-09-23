@@ -1,3 +1,5 @@
+import { Request, Response, NextFunction } from "express";
+
 declare namespace NodeJS {
   interface ProcessEnv {
     PG_USER: string;
@@ -11,7 +13,7 @@ declare namespace NodeJS {
 }
 
 type Enumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N ? Acc[number] : Enumerate<N, [...Acc, Acc['length']]>;
-type IntRange<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>;
+export type IntRange<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>;
 
 export type T_Sex = 'm' | 'f';
 export type T_Permission = 's' | 'f' | 'r';
@@ -95,3 +97,5 @@ export type T_Rating = {
   like_count: number;
   dislike_count: number;
 };
+
+export type T_Controller = (req: Request, res: Response, next: NextFunction) => Response<any>;
