@@ -3,12 +3,16 @@ import 'dotenv/config';
 import express from 'express';
 import cookie_parser from 'cookie-parser';
 import { db } from '@/db';
+import cors from '@/middleware/cors';
+import credentials from '@/middleware/credentials';
 
 const app = express();
 
 // General Middleware
 app.use(express.json({ limit: '128mb' }));
 app.use(cookie_parser());
+app.use(credentials);
+app.use(cors);
 
 async function start_server() {
   const PORT = process.env.PORT || 3201;
