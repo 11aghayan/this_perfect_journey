@@ -44,7 +44,9 @@ CREATE TABLE user_tbl (
   birthday DATE,
   sex SEX,
   join_date DATE DEFAULT now() NOT NULL,
-  refresh_token VARCHAR(255)
+  refresh_token VARCHAR(255),
+  is_blocked BOOLEAN DEFAULT FALSE NOT NULL,
+  block_reason VARCHAR(255)
 );
 
 CREATE TABLE password_tbl (
@@ -77,8 +79,8 @@ CREATE TABLE profile_photo_tbl (
 
 CREATE TABLE trip_tbl (
   id ID PRIMARY KEY,
-  user_id UUID NOT NULL,
   label VARCHAR(50) NOT NULL,
+  user_id UUID NOT NULL,
   view_count BIGINT DEFAULT 0 NOT NULL,
   cost INT,
   description TEXT NOT NULL,
@@ -86,8 +88,10 @@ CREATE TABLE trip_tbl (
   avg_rating RATING_SCORE,
   duration_from SMALLINT NOT NULL,
   duration_to SMALLINT NOT NULL,
-  type TRIP_TYPE NOT NULL,
-
+  type TRIP_TYPE[] NOT NULL,
+  create_date DATE DEFAULT NOW() NOT NULL,
+  is_blocked BOOLEAN DEFAULT FALSE NOT NULL,
+  block_reason VARCHAR(255),
 
   CONSTRAINT fk_user
     FOREIGN KEY(user_id)
@@ -139,6 +143,10 @@ CREATE TABLE photo_tbl(
   CONSTRAINT fk_trip 
     FOREIGN KEY(trip_id)
     REFERENCES trip_tbl(id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_destination
+    FOREIGN KEY(destination_id)
+    REFERENCES destination_tbl(id)
     ON DELETE CASCADE
 );
 
@@ -147,7 +155,7 @@ CREATE TABLE rating_tbl(
   trip_id UUID NOT NULL,
   user_id UUID NOT NULL,
   comment TEXT,
-  score RATING_SCORE,
+  score RATING_SCORE NOT NULL,
   replied_to UUID,
   like_count INT DEFAULT 0 NOT NULL,
   dislike_count INT DEFAULT 0 NOT NULL,
