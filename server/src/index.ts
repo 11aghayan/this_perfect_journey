@@ -1,9 +1,12 @@
-import 'module-alias/register';
 import 'dotenv/config';
+import module_alias from 'module-alias';
+module_alias.addAlias('@', __dirname);
+
 
 import express from 'express';
 import cookie_parser from 'cookie-parser';
 
+import '@/namespace';
 import { db } from '@/db';
 import cors from '@/middleware/cors';
 import credentials from '@/middleware/credentials';

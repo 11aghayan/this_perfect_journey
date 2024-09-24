@@ -1,4 +1,3 @@
-import { Response } from 'express';
 import { Pool } from 'pg';
 
 import { T_Admin } from '@/types';

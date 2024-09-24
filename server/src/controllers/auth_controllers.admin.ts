@@ -5,6 +5,9 @@ import type { T_Controller } from "@/types";
 import { custom_error, server_error } from "@/util/errors";
 import Db, { Db_no_data } from "@/db";
 
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+
 export const login: T_Controller = async (req, res) => {
   const { username, password } = req.body;
   
@@ -20,13 +23,13 @@ export const login: T_Controller = async (req, res) => {
     
     const access_token = jwt.sign(
       { username: admin.username }, 
-      process.env.ACCESS_TOKEN_SECRET,
+      ACCESS_TOKEN_SECRET,
       { expiresIn: '30m' }
     );
     
     const refresh_token = jwt.sign(
       { username: admin.username }, 
-      process.env.REFRESH_TOKEN_SECRET,
+      REFRESH_TOKEN_SECRET,
       { expiresIn: '1d' }
     );
     
@@ -88,7 +91,7 @@ export const refresh_token: T_Controller = async (req, res) => {
       
       const access_token = jwt.sign(
         { username: jwtPayload.username},
-        process.env.ACCESS_TOKEN_SECRET!,
+        ACCESS_TOKEN_SECRET,
         { expiresIn: '30m' }
       );
 
@@ -97,7 +100,7 @@ export const refresh_token: T_Controller = async (req, res) => {
 
     jwt.verify(
       refresh_token,
-      process.env.REFRESH_TOKEN_SECRET,
+      REFRESH_TOKEN_SECRET,
       handle_verification
     );
   } catch (error) {
