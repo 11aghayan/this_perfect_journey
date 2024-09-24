@@ -12,7 +12,7 @@ export const login: T_Controller = async (req, res) => {
   const { username, password } = req.body;
   
   try {
-    const admin = await Db.get_admin_by_username(username);
+    const admin = await Db.admin.get_by_username(username);
 
     if (admin instanceof Db_no_data) {
       return custom_error(res, 401, 'Wrong Credentials');
@@ -33,9 +33,7 @@ export const login: T_Controller = async (req, res) => {
       { expiresIn: '1d' }
     );
     
-    const update_response = await Db.update_refresh_token_admin(admin.id, refresh_token);
-    
-    if (update_response instanceof Db_no_data) return res.status(400).json({ message: update_response.message });
+    await Db.admin.update_refresh_token(admin.id, refresh_token);
     
     const max_age = 24 * 60 * 60 * 1000; //1 day
     
@@ -43,7 +41,7 @@ export const login: T_Controller = async (req, res) => {
     return res.status(200).json({ access_token });
     
   } catch (error) {
-    console.error('Error in admin login');
+    console.error('Error in admin login: ' + error);
     return server_error(res);
   }
 };
@@ -55,7 +53,7 @@ export const logout: T_Controller = async (req, res) => {
   const refresh_token = cookies.jwt;
 
   try {
-    const admin = await Db.get_admin_by_refresh_token(refresh_token);  
+    const admin = await Db.admin.get_by_refresh_token(refresh_token);  
     
     if (admin instanceof Db_no_data) {
       res.clearCookie('jwt', { httpOnly: true, secure: true, sameSite: 'none' });
@@ -63,14 +61,13 @@ export const logout: T_Controller = async (req, res) => {
       return res.sendStatus(204);
     }
     
-    const update_response = await Db.update_refresh_token_admin(admin.id, null);
-    if (update_response instanceof Db_no_data) return res.status(400).json({ message: update_response.message });
+    await Db.admin.update_refresh_token(admin.id, null);
     
     res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
 
     return res.sendStatus(204);
   } catch (error) {
-    console.error('Error in admin logout');
+    console.error('Error in admin logout: ' + error);
     return server_error(res);
   }
 };
@@ -81,7 +78,7 @@ export const refresh_token: T_Controller = async (req, res) => {
   if (!cookies.jwt) return custom_error(res, 401);
   const refresh_token = cookies.jwt;
    try {
-    const admin = await Db.get_admin_by_refresh_token(refresh_token);
+    const admin = await Db.admin.get_by_refresh_token(refresh_token);
 
     if (admin instanceof Db_no_data) return custom_error(res, 403);
 
@@ -104,7 +101,7 @@ export const refresh_token: T_Controller = async (req, res) => {
       handle_verification
     );
   } catch (error) {
-    console.error('Error in admin refresh token');
+    console.error('Error in admin refresh token: ' + error);
     return server_error(res);
   }
 };
