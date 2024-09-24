@@ -1,7 +1,8 @@
+import express from 'express';
+
 import { change_admin_password, get_admin_account_info } from '@/controllers/account_controllers.admin';
 import { check_password_defined, check_password_valid } from '@/middleware/check_body';
 import verify_jwt from '@/middleware/verify_jwt';
-import express from 'express';
 
 
 const account_router_admin = express.Router();
