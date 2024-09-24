@@ -23,14 +23,23 @@ export const db = new Pool({
   password
 });
 
+const db_error = (e: unknown) => {
+  const error = e as T_Pg_Error;
+  console.error(error);
+  return {
+    is_error: true,
+    message: error.detail
+  };
+};
+
 export default class Db {
 
   static get admin() {
-    return AdminMethods; 
+    return Admin_Methods; 
   }
 }
 
-class AdminMethods {
+class Admin_Methods {
   static async get_by_id(id: string) {
     try {
       const { rows } = await db.query(`
@@ -41,7 +50,7 @@ class AdminMethods {
 
       return Db_no_data.check(rows, 'No admin found with the given ID') ?? rows[0] as T_Admin;
     } catch (error) {
-      throw error;
+      return db_error(error);
     }
   }
 
@@ -55,31 +64,43 @@ class AdminMethods {
 
       return Db_no_data.check(rows, 'No admin found with the given username') ?? rows[0] as T_Admin;
     } catch (error) {
-      throw error;
+      return db_error(error);
     }
   }
 
   static async get_by_refresh_token(token: string) {
-    const { rows } = await db.query(`
-      SELECT * FROM admin_tbl 
-      WHERE refresh_token = $1;`, 
-      [token]
-    );
-    return Db_no_data.check(rows, 'No admin with the given refresh token') ?? rows[0] as T_Admin;
+    try {
+      const { rows } = await db.query(`
+        SELECT * FROM admin_tbl 
+        WHERE refresh_token = $1;`, 
+        [token]
+      );
+      return Db_no_data.check(rows, 'No admin with the given refresh token') ?? rows[0] as T_Admin;
+    } catch (error) {
+      return db_error(error);
+    }
   }
 
   static async update_refresh_token(id: string, token: string | null) {
-    await db.query(`
-      UPDATE admin_tbl 
-      SET refresh_token = $1 
-      WHERE id = $2;`, 
-      [token, id]
-    );
+    try {
+      await db.query(`
+        UPDATE admin_tbl 
+        SET refresh_token = $1 
+        WHERE id = $2;`, 
+        [token, id]
+      );
+    } catch (error) {
+      return db_error(error);
+    }
   }
   
   static async get_all() {
-    const { rows } = await db.query('SELECT * FROM admin_tbl;');
-    return Db_no_data.check(rows, 'Admins not found') ?? rows as T_Admin[];
+    try {
+      const { rows } = await db.query('SELECT * FROM admin_tbl;');
+      return Db_no_data.check(rows, 'Admins not found') ?? rows as T_Admin[];
+    } catch (error) {
+      return db_error(error);
+    }
   }
   
   static async create(username: string, password_hash: string, permission: T_Permission) {
@@ -94,12 +115,7 @@ class AdminMethods {
         [username, password_hash, permission]
       );
     } catch (error) {
-      const err = error as T_Pg_Error;
-      console.error(err);
-      return {
-        is_error: true,
-        message: err.detail
-      };
+      return db_error(error);
     }
   }
 
@@ -114,12 +130,7 @@ class AdminMethods {
         [username, permission, id]
       );
     } catch (error) {
-      const err = error as T_Pg_Error;
-      console.error(err);
-      return {
-        is_error: true,
-        message: err.detail
-      };
+      return db_error(error);
     }
   }
 
@@ -131,12 +142,20 @@ class AdminMethods {
         [id]
       );
     } catch (error) {
-      const err = error as T_Pg_Error;
-      console.error(err);
-      return {
-        is_error: true,
-        message: err.detail
-      };
+      return db_error(error);
+    }
+  }
+
+  static async change_password(username: string, hash: string) {
+    try {
+      await db.query(`
+        UPDATE admin_tbl
+        SET password_hash = $2
+        WHERE username = $1;`, 
+        [username, hash]
+      );
+    } catch (error) {
+      return db_error(error);
     }
   }
 }

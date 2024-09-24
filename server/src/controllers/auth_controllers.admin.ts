@@ -14,9 +14,8 @@ export const login: T_Controller = async (req, res) => {
   try {
     const admin = await Db.admin.get_by_username(username);
 
-    if (admin instanceof Db_no_data) {
-      return custom_error(res, 401, 'Wrong Credentials');
-    }
+    if (admin instanceof Db_no_data) return custom_error(res, 401, 'Wrong Credentials');
+    if ('is_error' in admin) return custom_error(res, 500, admin.message);
 
     const is_password_correct = await bcrypt.compare(password, admin.password_hash);
     if (!is_password_correct) return custom_error(res, 401, 'Wrong Credentials');
@@ -53,7 +52,8 @@ export const logout: T_Controller = async (req, res) => {
   const refresh_token = cookies.jwt;
 
   try {
-    const admin = await Db.admin.get_by_refresh_token(refresh_token);  
+    const admin = await Db.admin.get_by_refresh_token(refresh_token); 
+    if ('is_error' in admin) return custom_error(res, 500, admin.message); 
     
     if (admin instanceof Db_no_data) {
       res.clearCookie('jwt', { httpOnly: true, secure: true, sameSite: 'none' });
@@ -81,6 +81,7 @@ export const refresh_token: T_Controller = async (req, res) => {
     const admin = await Db.admin.get_by_refresh_token(refresh_token);
 
     if (admin instanceof Db_no_data) return custom_error(res, 403);
+    if ('is_error' in admin) return custom_error(res, 500, admin.message);
 
     const handle_verification = (err: VerifyErrors | null, decoded: JwtPayload | string | undefined) => {
       if (err || admin.username !== (decoded as JwtPayload)?.username) return custom_error(res, 403);

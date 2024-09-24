@@ -10,7 +10,8 @@ export const get_all_admins: T_Controller = async (_req, res) => {
   try {
     const admin_list = await Db.admin.get_all();
     if (admin_list instanceof Db_no_data) return custom_error(res, 404, admin_list.message);
-  
+    if ('is_error' in admin_list) return custom_error(res, 500, admin_list.message);
+    
     const filtered_admin_list = admin_list.map(obj => remove_key_from_obj(obj, 'password_hash'));
     
     return res.status(200).json(filtered_admin_list);
@@ -26,6 +27,7 @@ export const get_admin_by_id: T_Controller = async (req, res) => {
   try {
     const admin = await Db.admin.get_by_id(id);
     if (admin instanceof Db_no_data) return custom_error(res, 404, admin.message);
+    if ('is_error' in admin) return custom_error(res, 500, admin.message);
   
     const filtered_admin = remove_key_from_obj(admin, 'password_hash');
   

@@ -1,7 +1,7 @@
 import { T_Controller } from "@/types";
 import { custom_error, server_error } from "@/util/errors";
 
-export const check_valid_username: T_Controller = (req, res, next) => {
+export const check_username_defined: T_Controller = (req, res, next) => {
   try {
     const { username } = req.body;
 
@@ -14,7 +14,7 @@ export const check_valid_username: T_Controller = (req, res, next) => {
   }
 };
 
-export const check_valid_password: T_Controller = (req, res, next) => {
+export const check_password_defined: T_Controller = (req, res, next) => {
   try {
     const { password } = req.body;
 
@@ -27,7 +27,7 @@ export const check_valid_password: T_Controller = (req, res, next) => {
   }
 };
 
-export const check_valid_permission: T_Controller = (req, res, next) => {
+export const check_permission_valid: T_Controller = (req, res, next) => {
   const { permission } = req.body;
 
   const valid_values = ['s', 'f', 'r'];
@@ -37,3 +37,19 @@ export const check_valid_permission: T_Controller = (req, res, next) => {
   next();
 };
 
+export const check_password_valid: T_Controller = (req, res, next) => {
+  const { password, old_password } = req.body;
+
+  
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{10,}$/;
+  const is_valid = regex.test(password);
+  
+  if (!is_valid) return custom_error(
+    res, 
+    400, 
+    'Password must contain at least: One uppercase letter, one lowercase letter, one number, one special character and have at least 10 symbols length'
+  );
+  if (old_password !== undefined && old_password === password) return custom_error(res, 400, 'New password must not be the same as the old one');
+
+  next();
+};
