@@ -15,7 +15,7 @@ const verify_jwt: T_Controller = (req, res, next) => {
   const handle_verification = (err: VerifyErrors | null, decoded: JwtPayload | string | undefined) => {
     if (err) return custom_error(res, 403);
     const jwtPayload = decoded as JwtPayload;
-    req.body.jwt_username = jwtPayload.username;
+    req.body.jwt_id = jwtPayload.id;
     next();
   };
   

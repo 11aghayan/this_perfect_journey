@@ -1,39 +1,23 @@
+import Db from "@/db";
 import { T_Controller } from "@/types";
 import { custom_error, server_error } from "@/util/errors";
 
 export const check_username_defined: T_Controller = (req, res, next) => {
-  try {
-    const { username } = req.body;
-
-    if (!username) return custom_error(res, 400, 'Please provide username');
-    
-    next();
-  } catch (error) {
-    console.error("Error in check_valid_username: " + error);
-    return server_error(res);
-  }
+  const { username } = req.body;
+  if (!username) return custom_error(res, 400, 'Username is not provided');
+  next();
 };
 
 export const check_password_defined: T_Controller = (req, res, next) => {
-  try {
-    const { password } = req.body;
-
-    if (!password) return custom_error(res, 400, 'Please provide password');
-    
-    next();
-  } catch (error) {
-    console.error("Error in check_valid_password: " + error);
-    return server_error(res);
-  }
-};
+  const { password } = req.body;
+  if (!password) return custom_error(res, 400, 'Password is not provided');
+  next();
+}
 
 export const check_permission_valid: T_Controller = (req, res, next) => {
   const { permission } = req.body;
-
   const valid_values = ['s', 'f', 'r'];
-  
   if (!valid_values.includes(permission)) return custom_error(res, 400, `Wrong permission value. It should be "s", "f" or "r". You specified ${permission}`);
-
   next();
 };
 
@@ -51,5 +35,46 @@ export const check_password_valid: T_Controller = (req, res, next) => {
   );
   if (old_password !== undefined && old_password === password) return custom_error(res, 400, 'New password must not be the same as the old one');
 
+  next();
+};
+
+export const check_email_defined: T_Controller = (req, res, next) => {
+  const { email } = req.body;
+  if (!email) return custom_error(res, 400, 'Email is not provided');
+  next();
+};
+
+export const check_email_valid: T_Controller = async (req, res, next) => {
+  const { email } = req.body;
+
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const is_valid = regex.test(email);
+
+  if (!is_valid) return custom_error(res, 400, 'Email is not valid');
+
+  next();
+};
+
+export const check_email_in_db: T_Controller = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const email_in_db = await Db.user.is_email_in_db(email);
+    if (email_in_db) return custom_error(res, 400, 'Email is already registered. @Did you forget your password?@');
+    next();
+  } catch (error) {
+    console.error('Error in check_email_in_db: ' + error);
+    return server_error(res);
+  }
+};
+
+export const check_name_defined: T_Controller = (req, res, next) => {
+  const { name } = req.body;
+  if (!name) return custom_error(res, 400, 'Name is not provided');
+  next()
+};
+
+export const check_verification_code_defined: T_Controller = (req, res, next) => {
+  const { verification_code } = req.body;
+  if (!verification_code) return custom_error(res, 400, 'Verification code is not provided');
   next();
 };
