@@ -21,13 +21,13 @@ export const login: T_Controller = async (req, res) => {
     if (!is_password_correct) return custom_error(res, 401, 'Wrong Credentials');
     
     const access_token = jwt.sign(
-      { username: admin.username }, 
+      { id: admin.id }, 
       ACCESS_TOKEN_SECRET,
       { expiresIn: '30m' }
     );
     
     const refresh_token = jwt.sign(
-      { username: admin.username }, 
+      { id: admin.id }, 
       REFRESH_TOKEN_SECRET,
       { expiresIn: '1d' }
     );
@@ -37,7 +37,7 @@ export const login: T_Controller = async (req, res) => {
     const max_age = 24 * 60 * 60 * 1000; //1 day
     
     res.cookie('jwt', refresh_token, { httpOnly: true, sameSite: 'none', maxAge: max_age, secure: true });;
-    return res.status(200).json({ access_token });
+    return res.status(200).json({ access_token, role: admin.role });
     
   } catch (error) {
     console.error('Error in admin login: ' + error);
@@ -84,16 +84,16 @@ export const refresh_token: T_Controller = async (req, res) => {
     if ('is_error' in admin) return custom_error(res, 500, admin.message);
 
     const handle_verification = (err: VerifyErrors | null, decoded: JwtPayload | string | undefined) => {
-      if (err || admin.username !== (decoded as JwtPayload)?.username) return custom_error(res, 403);
+      if (err || admin.id !== (decoded as JwtPayload)?.id) return custom_error(res, 403);
       const jwtPayload = decoded as JwtPayload;
       
       const access_token = jwt.sign(
-        { username: jwtPayload.username},
+        { jwt_id: jwtPayload.id},
         ACCESS_TOKEN_SECRET,
         { expiresIn: '30m' }
       );
 
-      return res.json({ access_token });
+      return res.json({ access_token, role: admin.role });
     };
 
     jwt.verify(

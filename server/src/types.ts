@@ -15,21 +15,20 @@ export type T_Rating_Score = IntRange<1, 51>;
 export type T_User = {
   id: string;
   email: string;
+  password_hash: string;
+  role: 'user';
   name: string;
+  verified: boolean;
   birthday?: string;
   sex?: T_Sex;
   join_date: string;
   refresh_token: string;
 };
 
-export type T_Password = {
-  user_id: string;
-  hash: string;
-};
-
 export type T_Admin = {
   id: string;
   username: string;
+  role: 'admin';
   permission: T_Permission;
   password_hash: string;
   refresh_token: string;

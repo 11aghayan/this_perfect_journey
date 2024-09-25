@@ -45,7 +45,7 @@ export const create_admin: T_Controller = async (req, res) => {
     const password_hash = await bcrypt.hash(password, 10);
 
     const response = await Db.admin.create(username, password_hash, permission);
-    if (response?.is_error) return custom_error(res, 400, `${response.message}`);
+    if (response?.is_error) return custom_error(res, 400, response.message);
     
     return res.sendStatus(201);
   } catch (error) {
@@ -74,7 +74,7 @@ export const delete_admin: T_Controller = async (req, res) => {
 
   try {
     const response = await Db.admin.delete(id);
-    if (response?.is_error) return custom_error(res, 400, `${response.message}`);
+    if (response?.is_error) return custom_error(res, 400, response.message);
     
     return res.sendStatus(200);
   } catch (error) {

@@ -14,6 +14,8 @@ import not_found_controller from '@/controllers/not_found_controller';
 import auth_router_admin from '@/routes/auth_routes.admin';
 import superuser_router from '@/routes/superuser_routes';
 import account_router_admin from '@/routes/account_routes.admin';
+import auth_router_user from '@/routes/auth_routes.user';
+import account_router_user from '@/routes/account_routes.user';
 
 const app = express();
 
@@ -24,6 +26,8 @@ app.use(credentials);
 app.use(cors);
 
 // Routes
+app.use('/v1/account/user', account_router_user);
+app.use('/v1/auth/user', auth_router_user);
 app.use('/v1/account/admin', account_router_admin);
 app.use('/v1/admin', superuser_router);
 app.use('/v1/auth/admin', auth_router_admin);

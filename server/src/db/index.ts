@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 
-import { T_Admin, T_Permission } from '@/types';
+import { T_Admin, T_Permission, T_User } from '@/types';
 
 type T_Pg_Error = {
   detail: string;
@@ -37,13 +37,18 @@ export default class Db {
   static get admin() {
     return Admin_Methods; 
   }
+
+  static get user() {
+    return User_Methods;
+  }
 }
 
 class Admin_Methods {
   static async get_by_id(id: string) {
     try {
       const { rows } = await db.query(`
-        SELECT * FROM admin_tbl 
+        SELECT * 
+        FROM admin_tbl 
         WHERE id = $1;`, 
         [id]
       );
@@ -57,7 +62,8 @@ class Admin_Methods {
   static async get_by_username(username: string) {
     try {
       const { rows } = await db.query(`
-        SELECT * FROM admin_tbl 
+        SELECT * 
+        FROM admin_tbl 
         WHERE username = $1;`, 
         [username]
       );
@@ -71,7 +77,8 @@ class Admin_Methods {
   static async get_by_refresh_token(token: string) {
     try {
       const { rows } = await db.query(`
-        SELECT * FROM admin_tbl 
+        SELECT * 
+        FROM admin_tbl 
         WHERE refresh_token = $1;`, 
         [token]
       );
@@ -146,13 +153,113 @@ class Admin_Methods {
     }
   }
 
-  static async change_password(username: string, hash: string) {
+  static async change_password(id: string, hash: string) {
     try {
       await db.query(`
         UPDATE admin_tbl
         SET password_hash = $2
-        WHERE username = $1;`, 
-        [username, hash]
+        WHERE id = $1;`, 
+        [id, hash]
+      );
+    } catch (error) {
+      return db_error(error);
+    }
+  }
+}
+
+class User_Methods {
+  static async is_email_in_db(email: string) {
+    try {
+      const { rows } = await db.query(`
+        SELECT COUNT(*) 
+        FROM user_tbl
+        WHERE email = $1;`, 
+        [email]
+      );
+
+      return rows[0].count > 0;
+      
+    } catch (error) {
+      return db_error(error);
+    }
+  }
+
+  static async get_by_email(email: string) {
+    try {
+      const { rows } = await db.query(`
+        SELECT * 
+        FROM user_tbl
+        WHERE email = $1;
+        `, 
+        [email]
+      );
+
+      return Db_no_data.check(rows, 'Wrong credentials') ?? rows[0] as T_User;
+    } catch (error) {
+      return db_error(error);
+    }
+  }
+
+  static async update_refresh_token(id: string, token: string | null) {
+    try {
+      await db.query(`
+        UPDATE user_tbl 
+        SET refresh_token = $1 
+        WHERE id = $2;`, 
+        [token, id]
+      );
+    } catch (error) {
+      return db_error(error);
+    }
+  }
+
+  static async get_by_refresh_token(token: string) {
+    try {
+      const { rows } = await db.query(`
+        SELECT *
+        FROM user_tbl
+        WHERE refresh_token = $1;`, 
+        [token]
+      );
+
+      return Db_no_data.check(rows, 'No user with the given refresh token') ?? rows[0] as T_User;
+    } catch (error) {
+      return db_error(error);
+    }
+  }
+
+  static async register(email: string, name: string, password_hash: string) {
+    try {
+      const { rows } = await db.query(`
+        INSERT INTO user_tbl(email, name, password_hash) VALUES
+        ($1, $2, $3);`, 
+        [email, name]
+      );
+      
+      return rows[0] as T_User;
+    } catch (error) {
+      return db_error(error);
+    }
+  }
+
+  static async delete_by_id(id: string) {
+    try {
+      await db.query(`
+        DELETE FROM user_tbl
+        WHERE id = $1;`, 
+        [id]
+      );
+    } catch (error) {
+      return db_error(error);
+    }
+  }
+  
+  static async add_password(user_id: string, hash: string) {
+    try {
+      await db.query(`
+        INSERT INTO password_tbl(user_id, hash) VALUES
+        ($1, $2);`, 
+        [user_id, hash]
       );
     } catch (error) {
       return db_error(error);

@@ -6,10 +6,10 @@ import { custom_error, server_error } from "@/util/errors";
 
 
 export const get_admin_account_info: T_Controller = async (req, res) => {
-  const { jwt_username: username } = req.body;
+  const { jwt_id: id } = req.body;
   
   try {
-    const admin = await Db.admin.get_by_username(username);
+    const admin = await Db.admin.get_by_id(id);
     if (admin instanceof Db_no_data) return custom_error(res, 404, 'No admin found');
     if ('is_error' in admin) return custom_error(res, 500, admin.message);
 
@@ -28,10 +28,10 @@ export const get_admin_account_info: T_Controller = async (req, res) => {
 }; 
 
 export const change_admin_password: T_Controller = async (req, res) => {
-  const { jwt_username: username, password, old_password } = req.body;
+  const { jwt_id: id, password, old_password } = req.body;
 
   try {
-    const admin = await Db.admin.get_by_username(username);
+    const admin = await Db.admin.get_by_id(id);
     if (admin instanceof Db_no_data) return custom_error(res, 404, 'No admin found');
     if ('is_error' in admin) return custom_error(res, 500, admin.message);
 
@@ -40,7 +40,7 @@ export const change_admin_password: T_Controller = async (req, res) => {
 
     const new_hash = await bcrypt.hash(password, 10);
     
-    const response = await Db.admin.change_password(username, new_hash);
+    const response = await Db.admin.change_password(id, new_hash);
     if (response?.is_error) return custom_error(res, 500, response.message);
     
     return res.sendStatus(200);
