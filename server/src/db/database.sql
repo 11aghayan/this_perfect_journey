@@ -13,25 +13,25 @@ CREATE DOMAIN EMAIL AS CITEXT
   CHECK (value ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 
 CREATE DOMAIN SEX AS CHAR(1)
-  CHECK (value ~* '^m$|^f$');
+  CHECK (value ~ '^m$|^f$');
 
 CREATE DOMAIN PERMISSION AS CHAR(1) NOT NULL
-  CHECK(value ~* '^s$|^f$|^r$');
+  CHECK(value ~ '^s$|^f$|^r$');
 
 CREATE DOMAIN SEASON AS CHAR(2)
-  CHECK(value ~* '^sp$|^su$|^au$|^wi$|^al$');
+  CHECK(value ~ '^sp$|^su$|^au$|^wi$|^al$');
 
 CREATE DOMAIN TRIP_TYPE AS CHAR(3)
-  CHECK(value ~* '^rel$|^sig$|^act$|^cul$|^par$');
+  CHECK(value ~ '^rel$|^sig$|^act$|^cul$|^par$');
 
 CREATE DOMAIN PRIORITY AS CHAR(1)
-  CHECK(value ~* '^h$|^m$|^l$');
+  CHECK(value ~ '^h$|^m$|^l$');
 
 CREATE DOMAIN COVER_FOR AS CHAR(1)
-  CHECK(value ~* '^d$|^t$');
+  CHECK(value ~ '^d$|^t$');
 
 CREATE DOMAIN COVER_POS AS CHAR(1)
-  CHECK(value ~* '^l$|^m$|^r$');
+  CHECK(value ~ '^l$|^m$|^r$');
 
 CREATE DOMAIN RATING_SCORE AS SMALLINT
   CHECK(value >= 1 AND value <= 50);
@@ -40,6 +40,7 @@ CREATE DOMAIN RATING_SCORE AS SMALLINT
 CREATE TABLE user_tbl (
   id ID PRIMARY KEY,
   email EMAIL UNIQUE NOT NULL,
+  role CHAR(4) CHECK(role = 'user') DEFAULT 'user' NOT NULL,
   name VARCHAR(100) NOT NULL,
   birthday DATE,
   sex SEX,
@@ -62,6 +63,7 @@ CREATE TABLE password_tbl (
 CREATE TABLE admin_tbl (
   id ID PRIMARY KEY,
   username VARCHAR(20) UNIQUE NOT NULL,
+  role CHAR(5) CHECK(role = 'admin') DEFAULT 'admin' NOT NULL,
   permission PERMISSION,
   password_hash VARCHAR(60) NOT NULL,
   refresh_token VARCHAR(255)
