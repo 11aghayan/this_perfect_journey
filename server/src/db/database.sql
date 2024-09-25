@@ -46,9 +46,10 @@ CREATE TABLE user_tbl (
   sex SEX,
   join_date DATE DEFAULT now() NOT NULL,
   last_login DATE,
+  is_verified BOOLEAN DEFAULT FALSE NOT NULL
   refresh_token VARCHAR(255),
   is_blocked BOOLEAN DEFAULT FALSE NOT NULL,
-  block_reason VARCHAR(255)
+  block_reason VARCHAR(255),
 );
 
 CREATE TABLE password_tbl (
