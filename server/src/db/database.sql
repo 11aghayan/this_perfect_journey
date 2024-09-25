@@ -45,6 +45,7 @@ CREATE TABLE user_tbl (
   birthday DATE,
   sex SEX,
   join_date DATE DEFAULT now() NOT NULL,
+  last_login DATE,
   refresh_token VARCHAR(255),
   is_blocked BOOLEAN DEFAULT FALSE NOT NULL,
   block_reason VARCHAR(255)
