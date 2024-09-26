@@ -45,6 +45,7 @@ CREATE TABLE user_tbl (
   name VARCHAR(100) NOT NULL,
   birthday DATE,
   sex SEX,
+  nationality VARCHAR(60),
   join_date DATE DEFAULT now() NOT NULL,
   last_login DATE,
   is_verified BOOLEAN DEFAULT FALSE NOT NULL

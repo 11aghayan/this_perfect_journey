@@ -21,6 +21,7 @@ export type T_User = {
   verified: boolean;
   birthday?: string;
   sex?: T_Sex;
+  nationality: string;
   join_date: string;
   refresh_token: string;
 };
@@ -88,3 +89,11 @@ export type T_Rating = {
 };
 
 export type T_Controller = (req: Request, res: Response, next: NextFunction) => any;
+
+export type T_Email_Store = {
+  [email: string]: {
+    verification_code: string;
+    create_time: string;
+    timeout_id: NodeJS.Timeout | null;
+  }
+};
