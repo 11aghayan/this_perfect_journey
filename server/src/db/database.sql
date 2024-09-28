@@ -40,7 +40,7 @@ CREATE DOMAIN RATING_SCORE AS SMALLINT
 CREATE TABLE user_tbl (
   id ID PRIMARY KEY,
   email EMAIL UNIQUE NOT NULL,
-  password_hash VARCHAR(60) NOT NULL,
+  password_hash VARCHAR(60),
   role CHAR(4) CHECK(role = 'user') DEFAULT 'user' NOT NULL,
   name VARCHAR(100) NOT NULL,
   birthday DATE,
@@ -48,10 +48,10 @@ CREATE TABLE user_tbl (
   nationality VARCHAR(60),
   join_date DATE DEFAULT now() NOT NULL,
   last_login DATE,
-  is_verified BOOLEAN DEFAULT FALSE NOT NULL
+  is_verified BOOLEAN DEFAULT FALSE NOT NULL,
   refresh_token VARCHAR(255),
   is_blocked BOOLEAN DEFAULT FALSE NOT NULL,
-  block_reason VARCHAR(255),
+  block_reason VARCHAR(255)
 );
 
 CREATE TABLE admin_tbl (
