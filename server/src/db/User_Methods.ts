@@ -35,6 +35,21 @@ export default class User_Methods {
     }
   }
 
+  static async get_by_id(id: string) {
+    try {
+      const { rows } = await db.query(`
+        SELECT *
+        FROM user_tbl
+        WHERE id = $1;`, 
+        [id]
+      );
+
+      return Db_no_data.check(rows, 'No user found with the given ID') ?? rows[0] as T_User; 
+    } catch (error) {
+      return db_error(error);
+    }
+  }
+
   static async update_refresh_token(id: string, token: string | null) {
     try {
       await db.query(`
@@ -57,7 +72,7 @@ export default class User_Methods {
         [token]
       );
 
-      return Db_no_data.check(rows, 'No user with the given refresh token') ?? rows[0] as T_User;
+      return Db_no_data.check(rows, 'Wrong credentials') ?? rows[0] as T_User;
     } catch (error) {
       return db_error(error);
     }
@@ -73,7 +88,8 @@ export default class User_Methods {
     try {
       const { rows } = await db.query(`
         INSERT INTO user_tbl(email, name, password_hash, verified, birthday, sex) VALUES
-        ($1, $2, $3, $4, $5, $6);`, 
+        ($1, $2, $3, $4, $5, $6)
+        RETURNING *;`, 
         [email, name, password_hash, verified, birthday, sex]
       );
       
@@ -95,13 +111,13 @@ export default class User_Methods {
     }
   }
 
-  static async verify(user_id: string) {
+  static async verify(email: string) {
     try {
       await db.query(`
         UPDATE user_tbl
         SET verified = TRUE
-        WHERE id = $1;`, 
-        [user_id]
+        WHERE email = $1;`, 
+        [email]
       );
     } catch (error) {
       return db_error(error);

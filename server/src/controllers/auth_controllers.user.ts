@@ -19,8 +19,6 @@ export const login: T_Controller = async (req, res) => {
     const is_password_correct = await bcrypt.compare(password, user?.password_hash ?? '');
     
     if (!is_password_correct) return custom_error(res, 403, 'Wrong credentials');
-    
-    if (!user.verified) return res.status(401).json({ verified: false });
 
     const access_token = jwt.sign(
       { id: user.id }, 
@@ -168,7 +166,7 @@ export const register: T_Controller = async (req, res) => {
     
     return res.sendStatus(201);
   } catch (error) {
-    console.error('Error in user register: ' + error);
+    console.error('Error in user_register: ' + error);
     return server_error(res);
   }
 };

@@ -39,16 +39,6 @@ export const check_password_valid: T_Controller = (req, res, next) => {
   next();
 };
 
-export const parse_is_verified: T_Controller = (req, res, next) => {
-  const { is_verified } = req.body;
-
-  if (!is_verified) return custom_error(res, 400, 'Is verified missing');
-
-  req.body.is_verified = is_verified === 'true';  
-
-  next();
-};
-
 export const check_email_defined: T_Controller = (req, res, next) => {
   const { email } = req.body;
   if (!email) return custom_error(res, 400, 'Email missing');
@@ -66,11 +56,23 @@ export const check_email_valid: T_Controller = async (req, res, next) => {
   next();
 };
 
-export const check_email_in_db: T_Controller = async (req, res, next) => {
+export const prevent_email_repeat: T_Controller = async (req, res, next) => {
   const { email } = req.body;
   try {
     const email_in_db = await Db.user.is_email_in_db(email);
     if (email_in_db) return custom_error(res, 400, 'Email is already registered. @Did you forget your password?@');
+    next();
+  } catch (error) {
+    console.error('Error in check_email_in_db: ' + error);
+    return server_error(res);
+  }
+};
+
+export const check_email_in_db: T_Controller = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const email_in_db = await Db.user.is_email_in_db(email);
+    if (!email_in_db) return custom_error(res, 400, 'Email not found');
     next();
   } catch (error) {
     console.error('Error in check_email_in_db: ' + error);
@@ -124,7 +126,7 @@ export const check_verified_defined: T_Controller = (req, res, next) => {
 export const optimize_profile_photo: T_Controller = async (req, res, next) => {
   const { profile_photo } = req.body;
   
-  if (profile_photo.length < 1) return next();
+  if (!profile_photo || profile_photo.length < 1) return next();
 
   try {
     const optimized_photos = await optimize_photos({ photos: profile_photo, is_profile: true });
