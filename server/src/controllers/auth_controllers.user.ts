@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 
-import { T_Controller, T_User } from "@/types";
+import { T_Controller } from "@/types";
 import { custom_error, server_error } from "@/util/errors";
 import Db, { Db_no_data } from '@/db';
 
