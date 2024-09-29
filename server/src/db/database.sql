@@ -48,7 +48,7 @@ CREATE TABLE user_tbl (
   nationality VARCHAR(60),
   join_date DATE DEFAULT now() NOT NULL,
   last_login DATE,
-  is_verified BOOLEAN DEFAULT FALSE NOT NULL,
+  verified BOOLEAN DEFAULT FALSE NOT NULL,
   refresh_token VARCHAR(255),
   is_blocked BOOLEAN DEFAULT FALSE NOT NULL,
   block_reason VARCHAR(255)
