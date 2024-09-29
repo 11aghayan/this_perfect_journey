@@ -79,18 +79,23 @@ export default class User_Methods {
   }
 
   static async register(
-    email: string, 
-    name: string, 
-    password_hash: string | null = null, 
-    verified: boolean, 
-    sex: T_Sex | null = null, 
-    birthday: string | null = null) {
+    { email, name, verified, password_hash = null, sex = null, birthday = null, nationality = null }:
+    {
+      email: string; 
+      name: string; 
+      password_hash: string | null; 
+      verified: boolean; 
+      sex: T_Sex | null; 
+      birthday: string | null;
+      nationality: string | null
+    }
+    ) {
     try {
       const { rows } = await db.query(`
-        INSERT INTO user_tbl(email, name, password_hash, verified, birthday, sex) VALUES
-        ($1, $2, $3, $4, $5, $6)
+        INSERT INTO user_tbl(email, name, password_hash, verified, birthday, sex, nationality) VALUES
+        ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *;`, 
-        [email, name, password_hash, verified, birthday, sex]
+        [email, name, password_hash, verified, birthday, sex, nationality]
       );
       
       return rows[0] as T_User;
@@ -118,6 +123,54 @@ export default class User_Methods {
         SET verified = TRUE
         WHERE email = $1;`, 
         [email]
+      );
+    } catch (error) {
+      return db_error(error);
+    }
+  }
+
+  static async update_password(email: string, password_hash: string) {
+    try {
+      await db.query(`
+        UPDATE user_tbl
+        SET password_hash = $2
+        WHERE email = $1;`, 
+        [email, password_hash]
+      );
+    } catch (error) {
+      return db_error(error);
+    }
+  }
+
+  static async update_info({ id, name, birthday = null, nationality = null, sex = null }: { 
+    id: string, 
+    name: string, 
+    sex: T_Sex | null, 
+    birthday: string | null, 
+    nationality: string | null 
+  }) {
+    try {
+      await db.query(`
+        UPDATE user_tbl
+        SET name = $1,
+            birthday = $2,
+            nationality = $3,
+            sex = $4
+        WHERE id = $5;`, 
+        [name, birthday, nationality, sex, id]
+      );
+    } catch (error) {
+      return db_error(error);
+    }
+  }
+
+  static async change_password(id: string, password_hash: string) {
+    try {
+      await db.query(`
+        UPDATE user_tbl
+        SET password_hash = $1
+        WHERE id = $2;`, 
+        [password_hash, id]
       );
     } catch (error) {
       return db_error(error);

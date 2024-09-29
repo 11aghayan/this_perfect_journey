@@ -15,9 +15,8 @@ export const login: T_Controller = async (req, res) => {
     const user = await Db.user.get_by_email(email);
     if (user instanceof Db_no_data) return custom_error(res, 403, user.message);
     if ('is_error' in user) return custom_error(res, 500, user.message);
-    
-    const is_password_correct = await bcrypt.compare(password, user?.password_hash ?? '');
-    
+    if (!user?.password_hash) return custom_error(res, 403, 'Wrong credentials'); 
+    const is_password_correct = await bcrypt.compare(password, user.password_hash);
     if (!is_password_correct) return custom_error(res, 403, 'Wrong credentials');
 
     const access_token = jwt.sign(
@@ -151,10 +150,19 @@ export const refresh_token: T_Controller = async (req, res) => {
 };
 
 export const register: T_Controller = async (req, res) => {
-  const { email, name, password, sex, birthday, verified, profile_photo } = req.body;
+  const { 
+    email, 
+    name, 
+    password = null, 
+    sex = null, 
+    birthday = null, 
+    verified = null, 
+    profile_photo = null, 
+    nationality = null 
+  } = req.body;
   try {
     const password_hash = await bcrypt.hash(password, 10);
-    const user = await Db.user.register(email, name, password_hash, verified, sex, birthday);
+    const user = await Db.user.register({ email, name, password_hash, verified, sex, birthday, nationality });
     if ('is_error' in user) return custom_error(res, 500, user.message);
     
     if (profile_photo) {

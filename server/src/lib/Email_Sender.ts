@@ -43,11 +43,33 @@ export default class Email {
     
     try {
       await this.#transporter.sendMail(body);
-      return {
-        success: true
-      }
+      return { success: true };
     } catch (error) {
-      console.error('Error in Email.send: ' + error);
+      console.error('Error in Email_Sender -> send_verification_code: ' + error);
+      return {
+        success: false,
+        error
+      };
+    }
+  }
+
+  static async send_generated_password(email: string, password: string) {
+    const body: T_Email_Body = {
+      from: 'noreply@tripchronicles.world',
+      to: email,
+      subject: 'Password recovery',
+      html: `
+      <div>
+        <p>Your password is <b>${password}</b></p>
+        <p>Customize this message</p>
+      </div>`
+    };
+    
+    try {
+      await this.#transporter.sendMail(body);
+      return { success: true };
+    } catch (error) {
+      console.error('Error in Email_Sender -> send_generated_password: ');
       return {
         success: false,
         error

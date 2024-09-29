@@ -72,7 +72,7 @@ export const check_email_in_db: T_Controller = async (req, res, next) => {
   const { email } = req.body;
   try {
     const email_in_db = await Db.user.is_email_in_db(email);
-    if (!email_in_db) return custom_error(res, 400, 'Email not found');
+    if (!email_in_db) return custom_error(res, 400, 'Wrong credentials');
     next();
   } catch (error) {
     console.error('Error in check_email_in_db: ' + error);
@@ -120,6 +120,14 @@ export const check_sex_valid: T_Controller = (req, res, next) => {
 export const check_verified_defined: T_Controller = (req, res, next) => {
   const { verified } = req.body;
   if (verified !== true && verified !== false) return custom_error(res, 400, 'Verified missing. It must be Boolean');
+  next();
+};
+
+export const parse_nationality: T_Controller = (req, res, next) => {
+  const { nationality } = req.body;
+  if (nationality) {
+    req.body.nationality = nationality.toLowerCase();
+  }
   next();
 };
 

@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { check_email_defined, check_email_valid, check_name_defined, check_password_defined, check_password_valid, check_sex_valid, check_verification_code_defined, check_verified_defined, optimize_profile_photo, parse_birthday, prevent_email_repeat } from '@/middleware/check_body';
+import { check_email_defined, check_email_valid, check_name_defined, check_password_defined, check_password_valid, check_sex_valid, check_verification_code_defined, check_verified_defined, optimize_profile_photo, parse_birthday, parse_nationality, prevent_email_repeat } from '@/middleware/check_body';
 import { login, login_google, logout, refresh_token, register } from '@/controllers/auth_controllers.user';import { verify_google_id_token } from '@/middleware/verify_google';
 import { check_user_verified_by_email, check_user_verified_by_refresh_token } from '@/middleware/check_user_verified';
 ;
@@ -23,6 +23,7 @@ auth_router_user.post(
   prevent_email_repeat,
   parse_birthday,
   check_sex_valid,
+  parse_nationality,
   check_verified_defined,
   optimize_profile_photo,
   register
