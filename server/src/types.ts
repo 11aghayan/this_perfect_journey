@@ -3,6 +3,10 @@ import { Request, Response, NextFunction } from "express";
 type Enumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N ? Acc[number] : Enumerate<N, [...Acc, Acc['length']]>;
 export type IntRange<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>;
 
+type AtLeastOne<Obj, Keys extends keyof Obj = keyof Obj> = Pick<Obj, Exclude<keyof Obj, Keys>> & {
+  [K in Keys]-?: Required<Pick<Obj, K>> & Partial<Record<Exclude<Keys, K>, any>>;
+}[Keys];
+
 export type T_Sex = 'm' | 'f';
 export type T_Permission = 's' | 'f' | 'r';
 export type T_Season = 'sp' | 'su' | 'au' | 'wi' | 'al';
@@ -15,13 +19,13 @@ export type T_Rating_Score = IntRange<1, 51>;
 export type T_User = {
   id: string;
   email: string;
-  password_hash: string;
+  password_hash?: string;
   role: 'user';
   name: string;
   verified: boolean;
   birthday?: string;
   sex?: T_Sex;
-  nationality: string;
+  nationality?: string;
   join_date: string;
   refresh_token: string;
 };
@@ -97,3 +101,11 @@ export type T_Email_Store = {
     timeout_id: NodeJS.Timeout | null;
   }
 };
+
+export type T_Email_Body = AtLeastOne<{
+  from: string;
+  to: string;
+  subject: string;
+  text?: string;
+  html?: string;
+}, 'text' | 'html'>;

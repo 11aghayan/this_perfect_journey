@@ -22,6 +22,7 @@
     "@types/jsonwebtoken": "^9.0.7",
     "@types/module-alias": "^2.0.4",
     "@types/node": "^22.5.5",
+    "@types/nodemailer": "^6.4.16",
     "@types/pg": "^8.11.10",
     "eslint": "^9.10.0",
     "globals": "^15.9.0",
@@ -40,6 +41,8 @@
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
-    "pg": "^8.13.0"
+    "nodemailer": "^6.9.15",
+    "pg": "^8.13.0",
+    "sharp": "^0.33.5"
   }
 }

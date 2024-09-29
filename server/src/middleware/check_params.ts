@@ -6,7 +6,7 @@ const OWNER_USERNAME = process.env.OWNER_USERNAME as string;
 
 export const check_valid_id: T_Controller = (req, res, next) => {
   const { id } = req.params;
-  if (!id) return custom_error(res, 400, 'ID is missing');
+  if (!id) return custom_error(res, 400, 'ID missing');
   next();
 };
 
