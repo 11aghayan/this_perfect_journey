@@ -22,14 +22,18 @@ account_router_user.post(
   verify_user
 );
 
+account_router_user.get(
+  '/request-delete',
+  verify_jwt,
+  check_user_verified_by_id,
+  send_verification_code
+);
+
 account_router_user.delete(
   '/delete', 
   verify_jwt, 
   check_user_verified_by_id,
-  check_email_defined, 
-  check_email_valid, 
-  check_email_in_db,
-  check_password_defined,
+  check_verification_code_defined,
   delete_user
 );
 
